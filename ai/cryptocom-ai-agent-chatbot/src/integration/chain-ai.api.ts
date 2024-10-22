@@ -30,7 +30,7 @@ export const chainAiInstance = {
         query,
         options: {
           openAI: {
-            apiKey: import.meta.env.VITE_OPEN_AI_KEY,
+            apiKey: import.meta.env.VITE_OPENAI_API_KEY,
           },
           chain: 282,
           explorer: {
