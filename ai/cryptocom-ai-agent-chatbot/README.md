@@ -43,11 +43,8 @@ Before starting, ensure you have the following installed:
    Create a `.env` file in the project root:
 
    ```bash
-   VITE_OPENAI_API_KEY=<your-openai-api-key>
-   VITE_EXPLORER_API_KEY=<your-explorer-api-key>
-   VITE_AGENT_SERVICE_URL=<your-agent-service-url>
+   VITE_OPEN_AI_KEY=<your-openai-api-key>
    VITE_BASE_API_URL=<cryptocom-ai-agent-service-base-url>
-   VITE_BASE_WEBAPP_URL=<cryptocom-ai-agent-chatbot-base-url>
 
    These environment variables will configure the app to communicate with the Crypto.com AI Agent Service API.
    ```
