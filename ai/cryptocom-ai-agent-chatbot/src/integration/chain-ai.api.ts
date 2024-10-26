@@ -32,13 +32,6 @@ export const chainAiInstance = {
           openAI: {
             apiKey: import.meta.env.VITE_OPEN_AI_KEY,
           },
-          chain: 282,
-          explorer: {
-            apiKey: import.meta.env.VITE_EXPLORER_API_URL,
-          },
-          custom: {
-            provider: import.meta.env.VITE_BASE_WEBAPP_URL,
-          },
         },
       });
       const aiResponse = response.data;

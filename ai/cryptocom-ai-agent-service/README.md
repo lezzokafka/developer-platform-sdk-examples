@@ -69,6 +69,7 @@ The architecture:
 
     ```bash
     NODE_ENV=development
+    EXPLORER_API_KEY=<your-chain-explorer-api-key>
     ```
 
 4. **Run the development server**:

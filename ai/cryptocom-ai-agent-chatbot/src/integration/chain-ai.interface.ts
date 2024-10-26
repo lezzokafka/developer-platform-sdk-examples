@@ -2,10 +2,6 @@ export interface ClientConfig {
   openAI: {
     apiKey: string;
   };
-  chainId: string;
-  explorer: {
-    apiKey: string;
-  };
 }
 
 export interface ChainAiApiResponse {
