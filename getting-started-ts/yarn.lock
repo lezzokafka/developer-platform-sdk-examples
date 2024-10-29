@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@adraffy/ens-normalize/-/ens-normalize-1.10.1.tgz#63430d04bd8c5e74f8d7d049338f1cd9d4f02069"
   integrity sha512-96Z2IP3mYmF1Xg2cDm8f1gWGf/HUVedQ3FMifV4kG/PQ4yEP51xDtRAEfhVNt5f/uzpNkZHwWQuUcu6D6K+Ekw==
 
-"@crypto.com/developer-platform-client@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@crypto.com/developer-platform-client/-/developer-platform-client-1.0.3.tgz#5f08c69c250126277859564df87d7423c5e98650"
-  integrity sha512-ufap9TL3S8YCwKqkqaDZqZfnNpD4uhZhQH+yX/21On4ccq/FV/EhINYPSZAolH3jUhP3m2oZhF4H25dQ3bTCrQ==
+"@crypto.com/developer-platform-client@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@crypto.com/developer-platform-client/-/developer-platform-client-1.0.4.tgz#d08071e6485a110e33d4147b97a2fbea61c70fa6"
+  integrity sha512-k9as8Dttyr+I3KfNptdJSYfhJncfdlk9BkubauxQuQrkW3JR8h4IOx8L+PfG8RPiiJSDmIvwsysFPRqn9Fn4Ag==
 
 "@noble/curves@1.2.0":
   version "1.2.0"
