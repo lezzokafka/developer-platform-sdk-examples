@@ -10,7 +10,8 @@
     "prestart": "npm run build",
     "start": "node ./dist",
     "dev": "nodemon --watch src -e ts --exec npm run start",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
+    "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
     "@crypto.com/developer-platform-client": "^1.0.4",
