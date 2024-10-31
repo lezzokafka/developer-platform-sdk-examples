@@ -40,10 +40,11 @@ Before starting, ensure you have the following installed:
 
 3. **Set up environment variables**:
 
-   Create a `.env` file in the project root:
+   Create a `.env` file in the root of `ai/cryptocom-ai-agent-chatbot`. You can refer to the `.env.example` file for the required variables:
 
    ```bash
    VITE_OPEN_AI_KEY=<your-openai-api-key>
+   VITE_EXPLORER_API_KEY=<your-explorer-api-key>
    VITE_BASE_API_URL=<cryptocom-ai-agent-service-base-url>
 
    These environment variables will configure the app to communicate with the Crypto.com AI Agent Service API.
