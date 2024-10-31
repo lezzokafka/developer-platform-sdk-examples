@@ -1,12 +1,13 @@
+import { TOKEN_SYMBOLS_ADDRESSES } from './constants/token.constants.js';
+
 export const sendTransactionParameters = {
   type: 'object',
   properties: {
     to: { type: 'string', description: "Recipient's Ethereum address" },
     amount: { type: 'number', description: 'Amount to be send' },
-    symbol: {
+    contractAddress: {
       type: 'string',
-      description: 'Type of Token to send (e.g., TCRO, ETH)',
-      enum: ['TCRO', 'ETH'],
+      description: `Contract address of the token to send. Symbol to token mapping: ${JSON.stringify(TOKEN_SYMBOLS_ADDRESSES)}`,
     },
   },
   required: ['to', 'amount'],
@@ -109,7 +110,7 @@ export const wrapTokenParameters = {
   properties: {
     amount: {
       type: 'number',
-      description: 'Amount of token to be wrapped',
+      description: 'Amount of native token to be wrapped',
     },
   },
   required: ['amount'],
@@ -122,6 +123,14 @@ export const SwapTokenParameters = {
       type: 'number',
       description: 'Amount of token to be swapped',
     },
+    fromContractAddress: {
+      type: 'string',
+      description: `Contract address of the token to be swapped from. Symbol to token mapping: ${JSON.stringify(TOKEN_SYMBOLS_ADDRESSES)}`,
+    },
+    toContractAddress: {
+      type: 'string',
+      description: `Contract address of the token to be swapped to. Symbol to token mapping: ${JSON.stringify(TOKEN_SYMBOLS_ADDRESSES)}`,
+    },
   },
-  required: ['amount'],
+  required: ['amount', 'fromContractAddress', 'toContractAddress'],
 };
