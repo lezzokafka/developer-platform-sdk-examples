@@ -39,7 +39,8 @@ export interface FunctionArgs {
   to: string;
   amount: number;
   symbol: Symbol;
-  from: string;
+  fromContractAddress: string;
+  toContractAddress: string;
 }
 
 export enum Symbol {

@@ -1,9 +1,18 @@
+import {
+  Block,
+  Client,
+  Contract,
+  CronosZkEvm,
+  Token,
+  Transaction,
+  Wallet,
+} from '@crypto.com/developer-platform-client';
 import { OpenAI } from 'openai';
 import { ChatCompletionMessageParam } from 'openai/resources/index.js';
+import { validateFunctionArgs } from '../../helpers/agent.helpers.js';
 import { logger } from '../../helpers/logger.helper.js';
 import { BaseError } from '../../lib/errors/base.error.js';
 import { OpenAIModelError, OpenAIUnauthorizedError } from '../../lib/errors/service.errors.js';
-import { validateFunctionArgs } from '../../helpers/agent.helpers.js';
 import { CONTENT, TOOLS } from './agent.constants.js';
 import {
   AIMessageResponse,
@@ -15,15 +24,6 @@ import {
   Role,
   Status,
 } from './agent.interfaces.js';
-import {
-  Block,
-  Client,
-  Contract,
-  CronosZkEvm,
-  Token,
-  Transaction,
-  Wallet,
-} from '@crypto.com/developer-platform-client';
 
 /**
  * Initialize Developer Platform SDK
@@ -133,12 +133,6 @@ export class AIAgentService {
     try {
       validateFunctionArgs(functionArgs);
       switch (functionName) {
-        case BlockchainFunction.TransferToken:
-          return await Token.transfer({
-            to: functionArgs.to,
-            amount: functionArgs.amount,
-            contractAddress: functionArgs.contractAddress,
-          });
         case BlockchainFunction.GetBalance:
           return await Wallet.balance(functionArgs.address);
         case BlockchainFunction.GetLatestBlock:
@@ -159,16 +153,20 @@ export class AIAgentService {
           return await Transaction.getTransactionStatus(functionArgs.txHash);
         case BlockchainFunction.CreateWallet:
           return Wallet.create();
+        case BlockchainFunction.TransferToken:
+          return await Token.transfer({
+            to: functionArgs.to,
+            amount: functionArgs.amount,
+            contractAddress: functionArgs.contractAddress,
+          });
         case BlockchainFunction.WrapToken:
           return await Token.wrap({
-            fromContractAddress: functionArgs.from,
-            toContractAddress: functionArgs.to,
             amount: functionArgs.amount,
           });
         case BlockchainFunction.SwapToken:
           return await Token.swap({
-            fromContractAddress: functionArgs.from,
-            toContractAddress: functionArgs.to,
+            fromContractAddress: functionArgs.fromContractAddress,
+            toContractAddress: functionArgs.toContractAddress,
             amount: functionArgs.amount,
           });
         default:

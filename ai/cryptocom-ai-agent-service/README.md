@@ -65,7 +65,7 @@ The architecture:
     npm install
     ```
 
-3. **Create a `.env` file** with the following content:
+3. **Create a `.env` file** - at the root of `ai/cryptocom-ai-agent-service` with the following content, or refer to the `.env.example` file:
 
     ```bash
     NODE_ENV=development

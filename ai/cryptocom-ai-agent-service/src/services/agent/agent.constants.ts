@@ -22,7 +22,7 @@ export const TOOLS: OpenAI.Chat.ChatCompletionTool[] = [
     type: 'function',
     function: {
       name: BlockchainFunction.TransferToken,
-      description: 'Transfer a token from the current wallet',
+      description: 'Transfer native token or a token (specified by its contract address) to a recipient address',
       parameters: sendTransactionParameters,
     },
   },
@@ -102,7 +102,7 @@ export const TOOLS: OpenAI.Chat.ChatCompletionTool[] = [
     type: 'function',
     function: {
       name: BlockchainFunction.SwapToken,
-      description: 'Swap a token',
+      description: 'Swap a token from `fromContractAddress` to `toContractAddress`',
       parameters: SwapTokenParameters,
     },
   },
