@@ -58,7 +58,6 @@ export default class TokenService {
       }
 
       const receipt = await tx.wait();
-      console.log(receipt);
       return {
         status: Status.Success,
         data: {
