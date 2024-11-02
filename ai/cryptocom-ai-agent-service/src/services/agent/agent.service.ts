@@ -24,6 +24,7 @@ import {
   Role,
   Status,
 } from './agent.interfaces.js';
+/* import TokenService from '../token/token.service.js'; */
 
 /**
  * Initialize Developer Platform SDK
@@ -42,6 +43,7 @@ Client.init({
 export class AIAgentService {
   private options: Options;
   private client: OpenAI;
+  /* private tokenService: TokenService; */
 
   /**
    * @param {Options} options - Configuration options including chain details.
@@ -49,6 +51,7 @@ export class AIAgentService {
   constructor(options: Options) {
     this.options = options;
     this.client = new OpenAI({ apiKey: options.openAI.apiKey });
+    /* this.tokenService = new TokenService(process.env.RPC_URL!, process.env.PRIVATE_KEY!); */
   }
 
   /**
@@ -94,7 +97,7 @@ export class AIAgentService {
    *
    * @async
    * @param {AIMessageResponse} interpretation - The AI's interpretation of the user's query.
-   * @returns {Promise<BlockchainFunctionResponse<BlockchainFunctionType>[]>} - A Promise resolving to the processed blockchain function responses.
+   * @returns {Promise<FunctionCallResponse[]>} - A Promise resolving to the processed blockchain function responses.
    * @memberof AIAgentService
    */
   public async processInterpretation(interpretation: AIMessageResponse): Promise<FunctionCallResponse[]> {
@@ -123,7 +126,7 @@ export class AIAgentService {
    * @async
    * @param {BlockchainFunction} functionName - The blockchain function to execute.
    * @param {FunctionArgs} functionArgs - The arguments required for the function.
-   * @returns {Promise<BlockchainFunctionResponse<BlockchainFunctionType>>} - A Promise resolving to the blockchain function response.
+   * @returns {Promise<FunctionCallResponse>} - A Promise resolving to the blockchain function response.
    * @memberof AIAgentService
    */
   private async executeFunction(
@@ -159,6 +162,26 @@ export class AIAgentService {
             amount: functionArgs.amount,
             contractAddress: functionArgs.contractAddress,
           });
+        /**
+        @EXPERIMENTAL This example is for demonstration purposes only. 
+        USE AT YOUR OWN RISK and DO NOT use it in a production environment. 
+        DO NOT send any mainnet tokens to the accounts involved, as this may result in the loss of funds. 
+        We are not responsible for any loss of digital assets.
+        It is risky and unsafe to have private key in cleartext in the machine.
+
+        To use this feature, 
+        - replace the case below with the the values above for BlockchainFunction.TransferToken
+        - uncomment line 54, 46, and 27
+        - add relevant env
+        - sample query: "transfer 1 native token to 0x1cA1304F2cA3e5A1e45fD2b64EcD83EB58a420Ab",
+
+        case BlockchainFunction.TransferToken:
+          return await this.tokenService.transfer(
+            functionArgs.to,
+            functionArgs.amount.toString(),
+            functionArgs.contractAddress
+          );
+        */
         case BlockchainFunction.WrapToken:
           return await Token.wrap({
             amount: functionArgs.amount,
