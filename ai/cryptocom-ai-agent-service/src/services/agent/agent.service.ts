@@ -135,6 +135,7 @@ export class AIAgentService {
   ): Promise<FunctionCallResponse> {
     try {
       validateFunctionArgs(functionArgs);
+      let now: Date;
       switch (functionName) {
         case BlockchainFunction.GetBalance:
           return await Wallet.balance(functionArgs.address);
@@ -192,6 +193,15 @@ export class AIAgentService {
             toContractAddress: functionArgs.toContractAddress,
             amount: functionArgs.amount,
           });
+        case BlockchainFunction.GetCurrentTime:
+          now = new Date();
+          return {
+            status: Status.Success,
+            data: {
+              localTime: now.toLocaleString(),
+              utcTime: now.toUTCString(),
+            },
+          };
         default:
           return {
             status: Status.Failed,

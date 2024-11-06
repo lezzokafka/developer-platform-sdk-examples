@@ -77,6 +77,7 @@ export enum BlockchainFunction {
   CreateWallet = 'createWallet',
   WrapToken = 'wrapToken',
   SwapToken = 'swapToken',
+  GetCurrentTime = 'getCurrentTime',
   FunctionNotFound = 'functionNotFound',
 }
 
@@ -222,4 +223,9 @@ export interface Transaction {
 export interface FunctionCallResponse {
   status: Status;
   data: object;
+}
+
+export interface TimeData {
+  localTime: string;
+  utcTime: string;
 }

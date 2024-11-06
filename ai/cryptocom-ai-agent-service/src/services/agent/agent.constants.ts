@@ -11,6 +11,7 @@ import {
   getTransactionsByAddressParameters,
   sendTransactionParameters,
   wrapTokenParameters,
+  getCurrentTimeParameters,
 } from '../../helpers/chain-ai.helpers.js';
 import { BlockchainFunction } from './agent.interfaces.js';
 
@@ -104,6 +105,14 @@ export const TOOLS: OpenAI.Chat.ChatCompletionTool[] = [
       name: BlockchainFunction.SwapToken,
       description: 'Swap a token from `fromContractAddress` to `toContractAddress`',
       parameters: SwapTokenParameters,
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: BlockchainFunction.GetCurrentTime,
+      description: 'Get the current local and UTC time',
+      parameters: getCurrentTimeParameters,
     },
   },
 ];
