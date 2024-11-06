@@ -134,3 +134,8 @@ export const SwapTokenParameters = {
   },
   required: ['amount', 'fromContractAddress', 'toContractAddress'],
 };
+
+export const getCurrentTimeParameters = {
+  type: 'object',
+  properties: {},
+};
