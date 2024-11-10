@@ -20,16 +20,18 @@ Follow the instructions below to get the project up and running locally.
 
 Before starting, ensure you have the following installed:
 
-- **Node.js** (v18 or higher)
-- **npm** or **yarn**
+- **Node.js** (v18 or higher);
+- **npm** or **yarn**;
+- [AI-Agent-Service](https://github.com/crypto-com/developer-platform-sdk-examples/tree/main/ai/cryptocom-ai-agent-service);
+- [AI-Agent-Signer-App](https://github.com/crypto-com/cdc-ai-agent-signer-app) for transaction signing.
 
 ### Installation
 
 1. **Clone the repository**:
 
    ```bash
-    git clone https://github.com/developer-platform-sdk-examples.git
-    cd ai/cryptocom-ai-agent-chatbot
+    git clone https://github.com/crypto-com/developer-platform-sdk-examples.git
+    cd developer-platform-sdk-examples/ai/cryptocom-ai-agent-chatbot
    ```
 
 2. **Install dependencies**:
@@ -44,10 +46,8 @@ Before starting, ensure you have the following installed:
 
    ```bash
    VITE_OPEN_AI_KEY=<your-openai-api-key>
-   VITE_EXPLORER_API_KEY=<your-explorer-api-key>
-   VITE_BASE_API_URL=<cryptocom-ai-agent-service-base-url>
-
-   These environment variables will configure the app to communicate with the Crypto.com AI Agent Service API.
+   VITE_BASE_API_URL=http://localhost:8000
+   These environment variables will configure the app to communicate with the Crypto.com AI Agent Service API, "VITE_BASE_API_URL" stand for 
    ```
 
 ### Running the Application
