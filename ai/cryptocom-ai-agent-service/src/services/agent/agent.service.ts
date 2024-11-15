@@ -74,7 +74,7 @@ export class AIAgentService {
         { role: Role.User, content: query },
       ];
       const chatCompletion = await this.client.chat.completions.create({
-        model: this.options.openAI.model || 'gpt-4-turbo',
+        model: this.options.openAI.model || 'gpt-4o',
         messages: messages,
         tools: TOOLS,
         tool_choice: 'auto',
@@ -97,10 +97,16 @@ export class AIAgentService {
    *
    * @async
    * @param {AIMessageResponse} interpretation - The AI's interpretation of the user's query.
-   * @returns {Promise<FunctionCallResponse[]>} - A Promise resolving to the processed blockchain function responses.
+   * @param {string} query - The original user query
+   * @param {QueryContext[]} context - The conversation context
+   * @returns {Promise<{functionResponses: FunctionCallResponse[], finalResponse: string}>}
    * @memberof AIAgentService
    */
-  public async processInterpretation(interpretation: AIMessageResponse): Promise<FunctionCallResponse[]> {
+  public async processInterpretation(
+    interpretation: AIMessageResponse,
+    query: string,
+    context: QueryContext[]
+  ): Promise<{ functionResponses: FunctionCallResponse[]; finalResponse: string }> {
     let functionResponses: FunctionCallResponse[] = [];
     const functionsToExecute = interpretation.tool_calls;
 
@@ -112,13 +118,50 @@ export class AIAgentService {
           return await this.executeFunction(functionName, functionArgs);
         })
       );
-    } else {
-      functionResponses.push({
-        status: Status.Failed,
-        data: { content: interpretation.content },
-      });
     }
-    return functionResponses;
+
+    // Make a second call to OpenAI to generate a final response
+    const finalResponse = await this.generateFinalResponse(query, functionResponses, context);
+
+    return { functionResponses, finalResponse };
+  }
+
+  /**
+   * Generate a final response using OpenAI based on the function results
+   * @param query Original user query
+   * @param functionResponses Results from executed functions
+   * @param context Previous conversation context
+   */
+  private async generateFinalResponse(
+    query: string,
+    functionResponses: FunctionCallResponse[],
+    context: QueryContext[]
+  ): Promise<string> {
+    try {
+      const messages: Array<ChatCompletionMessageParam> = [
+        {
+          role: Role.System,
+          content:
+            'You are a helpful blockchain assistant. Generate a clear, concise response based on the function results.',
+        },
+        ...context,
+        { role: Role.User, content: query },
+        {
+          role: Role.Assistant,
+          content: `Function execution results: ${JSON.stringify(functionResponses, null, 2)}`,
+        },
+      ];
+
+      const completion = await this.client.chat.completions.create({
+        model: this.options.openAI.model || 'gpt-4o',
+        messages: messages,
+      });
+
+      return completion.choices[0].message.content || 'Unable to generate response';
+    } catch (e) {
+      logger.error('Error generating final response:', e);
+      return 'Error generating final response';
+    }
   }
 
   /**
