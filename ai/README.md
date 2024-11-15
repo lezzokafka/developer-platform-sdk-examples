@@ -1,4 +1,4 @@
-Here’s a simple README for the `ai` folder within the `developer-repository-sdk` repository, which will contain example AI applications:
+Here’s a simple README for the `ai` folder within the `developer-platform-sdk-examples` repository, which will contain example AI applications:
 
 ---
 
@@ -14,19 +14,23 @@ The AI example apps in this directory showcase various use cases of integrating 
 
 Each sub-folder contains an example AI application with code, configurations, and instructions on how to run and explore the use cases.
 
-### Example App 1: AI Query Handler
+### Example App 1: `cryptocom-ai-agent-service`
 
 This example demonstrates how to create an AI query handler that sends user inputs to the AI Agent and retrieves intelligent responses.
 
-- **Folder**: `./ai-query-handler`
-- **Functionality**: Send natural language queries to the Crypto.com AI Agent and receive responses based on blockchain data and actions.
+- **Folder**: `./cryptocom-ai-agent-service`
+- **Functionality**: By following this example, we will be able to self-host the AI element of the SDK, specifically the AI agent client, independently. This offers developers and projects greater control and flexibility compared to using the AI agent API directly. Underneath, the AI agent client utilizes the package to obtain data and interact with Cronos Chains.
+- [Reference documentation](https://ai-agent-sdk-docs.crypto.com/on-chain-functions-and-examples/self-hosting-ai-agent-server)
 
-### Example App 2: AI Token Balance Checker
+### Example App 2: `ai-agent-chatbot`
 
 This example shows how to use AI to check token balances by asking natural language questions.
 
-- **Folder**: `./ai-balance-checker`
-- **Functionality**: Ask the AI agent about token balances for a given address, and it retrieves the information directly from the blockchain.
+- **Folder**:
+   - `./cryptocom-ai-agent-chatbot` for **TypeScript**;
+   - `./cryptocom-ai-agent-chatbot` for **Python**.
+- **Functionality**: The Crypto.com AI Agent Chatbot is a Vite-powered React application integrated with OpenAI's NLP capabilities and the Crypto.com Developer Platform. This chatbot app allows users to interact with blockchain services through natural language, making it easy to query data or perform actions on the blockchain.
+- [Reference documentation](https://ai-agent-sdk-docs.crypto.com/on-chain-functions-and-examples/ai-agent-chatbot)
 
 ## Getting Started
 
@@ -43,8 +47,8 @@ To get started with the example apps in this folder:
 ## Requirements
 
 - Node.js v18+
-- An API key for the **Crypto.com Developer Platform**
-- Access to the **AI Agent Service** API
+- [Explorer API keys for Cronos Chains](https://ai-agent-sdk-docs.crypto.com/resources-for-developers#explorer-api-keys)
+- [OpenAI API key](https://platform.openai.com/docs/quickstart/developer-quickstart)
 
 ## Contributing
 
