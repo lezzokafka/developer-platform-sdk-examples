@@ -178,9 +178,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             reply_markup=reply_markup,
                         )
                     else:
-                        await update.message.reply_text(
-                            "Data:\n" + json.dumps(data, indent=2)
-                        )
+                        # If data is a dictionary, format as JSON, otherwise display as plain text
+                        if isinstance(data, dict):
+                            json_data = json.dumps(data, indent=2)
+                            formatted_data = f"```json\n{json_data}\n```"
+                            await update.message.reply_text(
+                                formatted_data, parse_mode=ParseMode.MARKDOWN_V2
+                            )
+                        else:
+                            await update.message.reply_text(str(data))
     else:
         await update.message.reply_text("Sorry, I couldn't connect to the AI service.")
 
