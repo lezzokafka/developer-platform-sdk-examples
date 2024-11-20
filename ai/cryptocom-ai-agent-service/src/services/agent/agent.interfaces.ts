@@ -1,3 +1,8 @@
+export enum LLMProvider {
+  OpenAI = 'openai',
+  Gemini = 'gemini',
+}
+
 export interface OpenAIOptions {
   apiKey: string;
   model?: string;
@@ -8,7 +13,9 @@ export interface ExplorerKeys {
 }
 
 export interface Options {
-  openAI: OpenAIOptions;
+  openAI?: OpenAIOptions;
+  gemini?: GeminiOptions;
+  llmProvider?: LLMProvider;
   chainId: number;
   context: QueryContext[];
 }
@@ -26,6 +33,7 @@ export enum Role {
   User = 'user',
   Assistant = 'assistant',
   System = 'system',
+  Tool = 'tool',
 }
 
 export interface FunctionArgs {
@@ -60,6 +68,8 @@ export interface AIMessageResponse {
 }
 
 export interface ToolCall {
+  id: string;
+  type: 'function';
   function: {
     name: BlockchainFunction;
     arguments: string;
@@ -229,4 +239,9 @@ export interface FunctionCallResponse {
 export interface TimeData {
   localTime: string;
   utcTime: string;
+}
+
+export interface GeminiOptions {
+  apiKey: string;
+  model?: string;
 }

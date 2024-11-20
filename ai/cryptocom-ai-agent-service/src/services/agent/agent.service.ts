@@ -7,24 +7,23 @@ import {
   Transaction,
   Wallet,
 } from '@crypto.com/developer-platform-client';
-import { OpenAI } from 'openai';
-import { ChatCompletionMessageParam } from 'openai/resources/index.js';
 import { validateFunctionArgs } from '../../helpers/agent.helpers.js';
 import { logger } from '../../helpers/logger.helper.js';
 import { BaseError } from '../../lib/errors/base.error.js';
-import { OpenAIModelError, OpenAIUnauthorizedError } from '../../lib/errors/service.errors.js';
-import { CONTENT, TOOLS } from './agent.constants.js';
 import {
   AIMessageResponse,
   BlockchainFunction,
   FunctionArgs,
   FunctionCallResponse,
+  LLMProvider,
   Options,
   QueryContext,
   Role,
   Status,
 } from './agent.interfaces.js';
-/* import TokenService from '../token/token.service.js'; */
+import { LLMService } from '../llm/llm.interface.js';
+import { OpenAIService } from '../llm/openai.service.js';
+import { GeminiService } from '../llm/gemini.service.js';
 
 /**
  * Initialize Developer Platform SDK
@@ -37,70 +36,44 @@ Client.init({
 
 /**
  * AIAgentService class handles Chain AI operations.
+ * This service processes user queries, interprets them using LLM providers,
+ * and executes blockchain-related functions based on the interpretation.
  *
  * @class AIAgentService
  */
 export class AIAgentService {
   private options: Options;
-  private client: OpenAI;
-  /* private tokenService: TokenService; */
+  private llmService: LLMService;
 
   /**
-   * @param {Options} options - Configuration options including chain details.
+   * Creates an instance of AIAgentService.
+   *
+   * @param {Options} options - Configuration options including chain details and LLM provider settings
+   * @throws {Error} When required LLM provider configuration is missing
    */
   constructor(options: Options) {
     this.options = options;
-    this.client = new OpenAI({ apiKey: options.openAI.apiKey });
-    /* this.tokenService = new TokenService(process.env.RPC_URL!, process.env.PRIVATE_KEY!); */
+    this.llmService = this.initializeLLMService(options.llmProvider || LLMProvider.OpenAI);
   }
 
   /**
-   * Interprets a user's query using AI to determine appropriate function calls.
+   * Interprets a user's query using the configured LLM service.
    *
-   * @async
-   * @param {string} query - The user's query to interpret.
-   * @param {QueryContext[]} context - The conversation context.
-   * @returns {Promise<ChatCompletion>} - A Promise resolving to the AI's interpretation and suggested function calls.
-   * @memberof AIAgentService
+   * @param {string} query - The user's natural language query
+   * @param {QueryContext[]} context - Previous conversation context
+   * @returns {Promise<AIMessageResponse>} The LLM's interpretation of the query
    */
   public async interpretUserQuery(query: string, context: QueryContext[]): Promise<AIMessageResponse> {
-    try {
-      const messages: Array<ChatCompletionMessageParam> = [
-        {
-          role: Role.System,
-          content: CONTENT,
-        },
-        ...context,
-        { role: Role.User, content: query },
-      ];
-      const chatCompletion = await this.client.chat.completions.create({
-        model: this.options.openAI.model || 'gpt-4o',
-        messages: messages,
-        tools: TOOLS,
-        tool_choice: 'auto',
-      });
-      return chatCompletion.choices[0].message as AIMessageResponse;
-    } catch (e) {
-      if (e instanceof Error && e.message.includes('Incorrect API key provided')) {
-        throw new OpenAIUnauthorizedError(`OpenAI API key is invalid. ${e.message}`);
-      }
-      if (e instanceof Error && e.message.includes('The model') && e.message.includes('does not exist')) {
-        throw new OpenAIModelError(`${e.message}`);
-      }
-      logger.error('Unknown error while interpreting user query: ', e);
-      throw e;
-    }
+    return this.llmService.interpretUserQuery(query, context);
   }
 
   /**
-   * Process AI's interpretation of the user's query, and returns a list of function responses.
+   * Processes the AI's interpretation of the query and executes relevant blockchain functions.
    *
-   * @async
-   * @param {AIMessageResponse} interpretation - The AI's interpretation of the user's query.
+   * @param {AIMessageResponse} interpretation - The AI's interpretation of the user's query
    * @param {string} query - The original user query
    * @param {QueryContext[]} context - The conversation context
    * @returns {Promise<{functionResponses: FunctionCallResponse[], finalResponse: string}>}
-   * @memberof AIAgentService
    */
   public async processInterpretation(
     interpretation: AIMessageResponse,
@@ -120,57 +93,58 @@ export class AIAgentService {
       );
     }
 
-    // Make a second call to OpenAI to generate a final response
     const finalResponse = await this.generateFinalResponse(query, functionResponses, context);
-
     return { functionResponses, finalResponse };
   }
 
   /**
-   * Generate a final response using OpenAI based on the function results
-   * @param query Original user query
-   * @param functionResponses Results from executed functions
-   * @param context Previous conversation context
+   * Updates the conversation context with new query and response.
+   * Maintains a rolling window of the last 10 context entries.
+   *
+   * @param {QueryContext[]} context - Current conversation context
+   * @param {string} query - User's query to add to context
+   * @param {string} response - AI's response to add to context
+   * @returns {QueryContext[]} Updated context array
    */
-  private async generateFinalResponse(
-    query: string,
-    functionResponses: FunctionCallResponse[],
-    context: QueryContext[]
-  ): Promise<string> {
-    try {
-      const messages: Array<ChatCompletionMessageParam> = [
-        {
-          role: Role.System,
-          content:
-            'You are a helpful blockchain assistant. Generate a clear, concise response based on the function results.',
-        },
-        ...context,
-        { role: Role.User, content: query },
-        {
-          role: Role.Assistant,
-          content: `Function execution results: ${JSON.stringify(functionResponses, null, 2)}`,
-        },
-      ];
+  public updateContext(context: QueryContext[], query: string, response: string): QueryContext[] {
+    context.push({ role: Role.User, content: query });
+    context.push({ role: Role.Assistant, content: response });
+    if (context.length > 10) context.shift();
+    return context;
+  }
 
-      const completion = await this.client.chat.completions.create({
-        model: this.options.openAI.model || 'gpt-4o',
-        messages: messages,
-      });
-
-      return completion.choices[0].message.content || 'Unable to generate response';
-    } catch (e) {
-      logger.error('Error generating final response:', e);
-      return 'Error generating final response';
+  /**
+   * Initializes the appropriate LLM service based on the provider configuration.
+   *
+   * @private
+   * @param {LLMProvider} provider - The LLM provider to initialize
+   * @returns {LLMService} Initialized LLM service
+   * @throws {Error} When provider configuration is missing or provider is unsupported
+   */
+  private initializeLLMService(provider: LLMProvider): LLMService {
+    switch (provider) {
+      case LLMProvider.OpenAI:
+        if (!this.options.openAI) {
+          throw new Error('OpenAI configuration is required when using OpenAI provider');
+        }
+        return new OpenAIService(this.options.openAI);
+      case LLMProvider.Gemini:
+        if (!this.options.gemini) {
+          throw new Error('Gemini configuration is required when using Gemini provider');
+        }
+        return new GeminiService(this.options.gemini);
+      default:
+        throw new Error(`Unsupported LLM provider: ${provider}`);
     }
   }
 
   /**
-   * Execute a function. Returns a BlockchainFunctionResponse regardless of the function execution status.
-   * @async
-   * @param {BlockchainFunction} functionName - The blockchain function to execute.
-   * @param {FunctionArgs} functionArgs - The arguments required for the function.
-   * @returns {Promise<FunctionCallResponse>} - A Promise resolving to the blockchain function response.
-   * @memberof AIAgentService
+   * Executes a blockchain function with the provided arguments.
+   *
+   * @private
+   * @param {BlockchainFunction} functionName - The blockchain function to execute
+   * @param {FunctionArgs} functionArgs - Arguments for the function
+   * @returns {Promise<FunctionCallResponse>} Result of the function execution
    */
   private async executeFunction(
     functionName: BlockchainFunction,
@@ -178,7 +152,7 @@ export class AIAgentService {
   ): Promise<FunctionCallResponse> {
     try {
       validateFunctionArgs(functionArgs);
-      let now: Date;
+
       switch (functionName) {
         case BlockchainFunction.GetBalance:
           return await Wallet.balance(functionArgs.address);
@@ -226,6 +200,7 @@ export class AIAgentService {
             functionArgs.contractAddress
           );
         */
+
         case BlockchainFunction.WrapToken:
           return await Token.wrap({
             amount: functionArgs.amount,
@@ -236,8 +211,8 @@ export class AIAgentService {
             toContractAddress: functionArgs.toContractAddress,
             amount: functionArgs.amount,
           });
-        case BlockchainFunction.GetCurrentTime:
-          now = new Date();
+        case BlockchainFunction.GetCurrentTime: {
+          const now = new Date();
           return {
             status: Status.Success,
             data: {
@@ -245,6 +220,7 @@ export class AIAgentService {
               utcTime: now.toUTCString(),
             },
           };
+        }
         default:
           return {
             status: Status.Failed,
@@ -253,39 +229,39 @@ export class AIAgentService {
             },
           };
       }
-    } catch (e) {
-      if (e instanceof BaseError) {
+    } catch (error: unknown) {
+      if (error instanceof BaseError) {
         return {
           status: Status.Failed,
           data: {
-            message: `Error during execution: ${e.message}`,
+            message: `Error during execution: ${error.message}`,
           },
         };
       }
-      logger.error('Unknown error during execution: ', e);
+      logger.error('Unknown error during execution: ', error);
       return {
         status: Status.Failed,
         data: {
-          message: `Unknown error during execution: ${e}`,
+          message: error instanceof Error ? error.message : 'Unknown error during execution',
         },
       };
     }
   }
 
   /**
-   * Updates the conversation context with the user's query and the AI's response.
+   * Generates a final response using the LLM service based on the query and function responses.
    *
-   * @async
-   * @param {QueryContext[]} context - The current conversation context.
-   * @param {string} query - The user's query.
-   * @param {string} response - Stringified JSON response from the AI.
-   * @returns {QueryContext} - The updated context.
-   * @memberof AIAgentService
+   * @private
+   * @param {string} query - Original user query
+   * @param {FunctionCallResponse[]} functionResponses - Results from executed functions
+   * @param {QueryContext[]} context - Conversation context
+   * @returns {Promise<string>} Generated final response
    */
-  public updateContext(context: QueryContext[], query: string, response: string): QueryContext[] {
-    context.push({ role: Role.User, content: query });
-    context.push({ role: Role.Assistant, content: response });
-    if (context.length > 10) context.shift();
-    return context;
+  private async generateFinalResponse(
+    query: string,
+    functionResponses: FunctionCallResponse[],
+    context: QueryContext[]
+  ): Promise<string> {
+    return this.llmService.generateFinalResponse(query, functionResponses, context);
   }
 }

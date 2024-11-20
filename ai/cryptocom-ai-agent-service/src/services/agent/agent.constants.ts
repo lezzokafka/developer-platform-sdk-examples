@@ -116,3 +116,168 @@ export const TOOLS: OpenAI.Chat.ChatCompletionTool[] = [
     },
   },
 ];
+
+export const GEMINI_TOOLS = {
+  function_declarations: [
+    {
+      name: BlockchainFunction.GetLatestBlock,
+      description: "Get information about block by its number or tag (e.g. 'latest', 'earliest', 'pending')",
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          tag: {
+            type: 'STRING',
+            description: 'The tag or number of the block',
+          },
+        },
+        required: ['tag'],
+      },
+    },
+    {
+      name: BlockchainFunction.GetTransactionStatus,
+      description: 'Get the status of a transaction by its hash',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          hash: {
+            type: 'STRING',
+            description: 'The hash of the transaction',
+          },
+        },
+        required: ['hash'],
+      },
+    },
+    {
+      name: BlockchainFunction.CreateWallet,
+      description: 'Create a new random wallet',
+    },
+    {
+      name: BlockchainFunction.WrapToken,
+      description: 'Wrap a token',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          token: {
+            type: 'STRING',
+            description: 'The token to be wrapped',
+          },
+        },
+        required: ['token'],
+      },
+    },
+    {
+      name: BlockchainFunction.SwapToken,
+      description: 'Swap a token from `fromContractAddress` to `toContractAddress`',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          fromContractAddress: {
+            type: 'STRING',
+            description: 'The contract address of the token to be swapped from',
+          },
+          toContractAddress: {
+            type: 'STRING',
+            description: 'The contract address of the token to be swapped to',
+          },
+        },
+        required: ['fromContractAddress', 'toContractAddress'],
+      },
+    },
+    {
+      name: BlockchainFunction.GetCurrentTime,
+      description: 'Get the current local and UTC time',
+    },
+    {
+      name: BlockchainFunction.TransferToken,
+      description: 'Transfer native token or a token (specified by its contract address) to a recipient address',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          recipientAddress: {
+            type: 'STRING',
+            description: 'The recipient address',
+          },
+          amount: {
+            type: 'STRING',
+            description: 'The amount to transfer',
+          },
+          contractAddress: {
+            type: 'STRING',
+            description: 'The contract address of the token (optional for native token)',
+          },
+        },
+        required: ['recipientAddress', 'amount'],
+      },
+    },
+    {
+      name: BlockchainFunction.GetBalance,
+      description: 'Get the current balance of specified wallet address',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          address: {
+            type: 'STRING',
+            description: 'Wallet address to get balance for',
+          },
+        },
+        required: ['address'],
+      },
+    },
+    {
+      name: BlockchainFunction.GetTransactionsByAddress,
+      description: 'Get the list of transactions for a specified Cronos address',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          address: {
+            type: 'STRING',
+            description: 'The address to get transactions for',
+          },
+        },
+        required: ['address'],
+      },
+    },
+    {
+      name: BlockchainFunction.GetContractABI,
+      description: 'Get the ABI of a verified smart contract',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          contractAddress: {
+            type: 'STRING',
+            description: 'The contract address',
+          },
+        },
+        required: ['contractAddress'],
+      },
+    },
+    {
+      name: BlockchainFunction.GetTransactionByHash,
+      description: 'Get the details of a transaction by its hash',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          hash: {
+            type: 'STRING',
+            description: 'The hash of the transaction',
+          },
+        },
+        required: ['hash'],
+      },
+    },
+    {
+      name: BlockchainFunction.GetBlockByTag,
+      description: 'Get information about block by its number or tag (e.g. "latest", "earliest", "pending")',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          tag: {
+            type: 'STRING',
+            description: 'The tag or number of the block',
+          },
+        },
+        required: ['tag'],
+      },
+    },
+  ],
+};
