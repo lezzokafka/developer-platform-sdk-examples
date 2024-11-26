@@ -8,15 +8,13 @@ async function main() {
   const jsonRpcProvider = new ethers.JsonRpcProvider(HTTP_ENDPOINT);
   const provider = new ethers.WebSocketProvider(WS_ENDPOINT);
   console.log('Connected to provider');
-  
+
   provider.on('block', async (blockNumber) => {
     console.log(`Received block ${blockNumber}`);
-    
+
     const block = await jsonRpcProvider.getBlock(blockNumber, true);
-    
-    const relevantTxs = block.prefetchedTransactions.filter(tx => 
-      tx.from?.toLowerCase() === TARGET_ADDRESS
-    );
+
+    const relevantTxs = block.prefetchedTransactions.filter((tx) => tx.from?.toLowerCase() === TARGET_ADDRESS);
 
     if (relevantTxs.length > 0) {
       console.log(`Found ${relevantTxs.length} transactions for address ${TARGET_ADDRESS} in block ${block.number}`);
@@ -26,3 +24,5 @@ async function main() {
 }
 
 main().catch(console.error);
+
+// the goal is to pull periodically events from the blockchain to get the latest transaction
