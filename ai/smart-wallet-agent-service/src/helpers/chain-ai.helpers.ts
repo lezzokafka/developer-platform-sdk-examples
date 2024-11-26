@@ -110,7 +110,7 @@ export const copyTransactionsParameters = {
   properties: {
     from: {
       type: 'string',
-      description: `Wallet address to be used`,
+      description: `Copy the transaction from a top wallet address and execute it with the 'from' wallet`,
     },
   },
   required: ['from'],
@@ -154,4 +154,15 @@ export const SwapTokenParameters = {
 export const getCurrentTimeParameters = {
   type: 'object',
   properties: {},
+};
+
+export const copyTransactionParameters = {
+  type: 'object',
+  properties: {
+    from: {
+      type: 'string',
+      description: 'Smart wallet address',
+    },
+  },
+  required: ['from'],
 };

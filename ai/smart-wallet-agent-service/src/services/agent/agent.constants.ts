@@ -1,18 +1,18 @@
 import OpenAI from 'openai';
 import {
   SwapTokenParameters,
+  copyTransactionsParameters,
   createWalletParameters,
   getBalanceParameters,
   getBlockByTagParameters,
   getContractAbiParameters,
+  getCurrentTimeParameters,
   getLatestBlockParameters,
   getTransactionByHash,
   getTransactionStatusParameters,
   getTransactionsByAddressParameters,
   sendTransactionParameters,
   wrapTokenParameters,
-  getCurrentTimeParameters,
-  copyTransactionsParameters,
 } from '../../helpers/chain-ai.helpers.js';
 import { BlockchainFunction } from './agent.interfaces.js';
 

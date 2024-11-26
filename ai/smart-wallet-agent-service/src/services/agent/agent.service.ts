@@ -13,6 +13,8 @@ import { validateFunctionArgs } from '../../helpers/agent.helpers.js';
 import { logger } from '../../helpers/logger.helper.js';
 import { BaseError } from '../../lib/errors/base.error.js';
 import { OpenAIModelError, OpenAIUnauthorizedError } from '../../lib/errors/service.errors.js';
+import { SmartWalletService } from '../smartwallet/smartwallet.service.js';
+import TokenService from '../token/token.service.js';
 import { CONTENT, TOOLS } from './agent.constants.js';
 import {
   AIMessageResponse,
@@ -24,8 +26,6 @@ import {
   Role,
   Status,
 } from './agent.interfaces.js';
-import TokenService from '../token/token.service.js';
-import { SmartWalletService } from '../smartwallet/smartwallet.service.js';
 
 /**
  * Initialize Developer Platform SDK
@@ -162,15 +162,14 @@ export class AIAgentService {
           return this.smartWalletService.authorizeWallet();
         case BlockchainFunction.GetPrivateKey:
           return this.smartWalletService.getPrivateKey();
+        case BlockchainFunction.CopyTransaction:
+          return this.smartWalletService.copyTransactions(functionArgs.from);
         case BlockchainFunction.TransferToken:
           return await this.tokenService.transfer(
             functionArgs.to,
             functionArgs.amount.toString(),
             functionArgs.contractAddress
           );
-        /**
-        @HACKATHON BlockchainFunction.CopyTransaction:
-          return await this.smartWalletService.copyTransactions(functionArgs.from); */
         /**
         @EXPERIMENTAL This example is for demonstration purposes only. 
         USE AT YOUR OWN RISK and DO NOT use it in a production environment. 

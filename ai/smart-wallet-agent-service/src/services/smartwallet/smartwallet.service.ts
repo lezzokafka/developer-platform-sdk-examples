@@ -64,4 +64,19 @@ export class SmartWalletService {
       },
     };
   }
+
+  /**
+   * Copies the transactions from the smart wallet to the user's wallet.
+   */
+  public copyTransactions(from: string): FunctionCallResponse {
+    // Logic to read transaction from the top wallet (hardcoded)
+    // Logic to copy and send that transaction from `from` wallet
+
+    return {
+      status: Status.Success,
+      data: {
+        message: `Copied transactions from ${from}`,
+      },
+    };
+  }
 }
