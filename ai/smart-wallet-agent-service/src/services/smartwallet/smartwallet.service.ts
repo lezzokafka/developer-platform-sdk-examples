@@ -3,11 +3,11 @@ import { logger } from '../../helpers/logger.helper.js';
 import { FunctionCallResponse, Status } from '../agent/agent.interfaces.js';
 
 /**
- * WalletService class handles requests to provider or explorer API.
+ * SmartWalletService class handles requests to provider or explorer API.
  *
  * @class WalletService
  */
-export class WalletService {
+export class SmartWalletService {
   private static privateKey: string = 'empty';
 
   /**
@@ -21,8 +21,8 @@ export class WalletService {
     try {
       const wallet = ethers.Wallet.createRandom();
 
-      WalletService.privateKey = wallet.privateKey;
-      logger.info(WalletService.privateKey);
+      SmartWalletService.privateKey = wallet.privateKey;
+      logger.info(SmartWalletService.privateKey);
       return {
         status: Status.Success,
         data: {
@@ -47,8 +47,8 @@ export class WalletService {
    * @returns {string | null} - The private key, or null if not set.
    */
   public getPrivateKey(): FunctionCallResponse {
-    logger.info(WalletService.privateKey);
-    if (!WalletService.privateKey) {
+    logger.info(SmartWalletService.privateKey);
+    if (!SmartWalletService.privateKey) {
       return {
         status: Status.Failed,
         data: {
@@ -60,7 +60,7 @@ export class WalletService {
     return {
       status: Status.Success,
       data: {
-        privateKey: WalletService.privateKey,
+        privateKey: SmartWalletService.privateKey,
       },
     };
   }

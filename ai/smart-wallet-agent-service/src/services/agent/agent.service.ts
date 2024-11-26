@@ -25,7 +25,7 @@ import {
   Status,
 } from './agent.interfaces.js';
 import TokenService from '../token/token.service.js';
-import { WalletService } from '../smartwallet/smartwallet.service.js';
+import { SmartWalletService } from '../smartwallet/smartwallet.service.js';
 
 /**
  * Initialize Developer Platform SDK
@@ -45,7 +45,7 @@ export class AIAgentService {
   private options: Options;
   private client: OpenAI;
   private tokenService: TokenService;
-  private walletService: WalletService;
+  private smartWalletService: SmartWalletService;
 
   /**
    * @param {Options} options - Configuration options including chain details.
@@ -54,7 +54,7 @@ export class AIAgentService {
     this.options = options;
     this.client = new OpenAI({ apiKey: options.openAI.apiKey });
     this.tokenService = new TokenService(process.env.RPC_URL!, process.env.PRIVATE_KEY!);
-    this.walletService = new WalletService();
+    this.smartWalletService = new SmartWalletService();
   }
 
   /**
@@ -159,9 +159,9 @@ export class AIAgentService {
         case BlockchainFunction.GetTransactionStatus:
           return await Transaction.getTransactionStatus(functionArgs.txHash);
         case BlockchainFunction.CreateWallet:
-          return this.walletService.authorizeWallet();
+          return this.smartWalletService.authorizeWallet();
         case BlockchainFunction.GetPrivateKey:
-          return this.walletService.getPrivateKey();
+          return this.smartWalletService.getPrivateKey();
         case BlockchainFunction.TransferToken:
           return await this.tokenService.transfer(
             functionArgs.to,
@@ -170,7 +170,7 @@ export class AIAgentService {
           );
         /**
         @HACKATHON BlockchainFunction.CopyTransaction:
-          return await this.smartWallet.copyTransactions(functionArgs.from); */
+          return await this.smartWalletService.copyTransactions(functionArgs.from); */
         /**
         @EXPERIMENTAL This example is for demonstration purposes only. 
         USE AT YOUR OWN RISK and DO NOT use it in a production environment. 
