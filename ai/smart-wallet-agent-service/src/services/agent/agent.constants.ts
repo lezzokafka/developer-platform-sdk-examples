@@ -133,3 +133,13 @@ export const TOOLS: OpenAI.Chat.ChatCompletionTool[] = [
 // Step 2
 // do a copy trade on this address -- do make me rich
 //
+
+// here is my address, can you diversify my wallet based on the top 10 addresses
+
+// after address authorized
+
+// copy transaction of the top account with the top profits.
+
+// sure I will follow the top 10 accounts and copy trade their transactions (hardcoded wallet).
+
+// we will listen to future transactuions based on the hardcoded wallet.

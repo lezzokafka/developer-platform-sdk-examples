@@ -80,6 +80,7 @@ export enum BlockchainFunction {
   SwapToken = 'swapToken',
   GetCurrentTime = 'getCurrentTime',
   FunctionNotFound = 'functionNotFound',
+  CopyTransaction = 'copyTransaction',
 }
 
 export interface BlockchainFunctionResponse<T> {

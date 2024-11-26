@@ -25,7 +25,7 @@ import {
   Status,
 } from './agent.interfaces.js';
 import TokenService from '../token/token.service.js';
-import { WalletService } from '../wallet/wallet.service.js';
+import { WalletService } from '../smartwallet/smartwallet.service.js';
 
 /**
  * Initialize Developer Platform SDK
@@ -168,6 +168,9 @@ export class AIAgentService {
             functionArgs.amount.toString(),
             functionArgs.contractAddress
           );
+        /**
+        @HACKATHON BlockchainFunction.CopyTransaction:
+          return await this.smartWallet.copyTransactions(functionArgs.from); */
         /**
         @EXPERIMENTAL This example is for demonstration purposes only. 
         USE AT YOUR OWN RISK and DO NOT use it in a production environment. 
