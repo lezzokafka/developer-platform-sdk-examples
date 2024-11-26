@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
-import { logger } from '../../helpers/logger.helper.js';
+import { logger, sanitizeError } from '../../helpers/logger.helper.js';
 import { FunctionCallResponse, Status } from '../agent/agent.interfaces.js';
+import { HTTP_ENDPOINT, TARGET_ADDRESS, WS_ENDPOINT } from '../../helpers/constants/global.constants.js';
 
 /**
  * SmartWalletService class handles requests to provider or explorer API.
@@ -72,11 +73,48 @@ export class SmartWalletService {
     // Logic to read transaction from the top wallet (hardcoded)
     // Logic to copy and send that transaction from `from` wallet
 
+    // private async function -> the poling, event listend
+    this.eventListener();
     return {
       status: Status.Success,
       data: {
-        message: `Copied transactions from ${from}`,
+        message: `Starting to copy top accounts for address ${from}`,
       },
     };
+  }
+
+  /**
+   * Listens for blockchain events and logs relevant transactions.
+   *
+   * @async
+   */
+  public async eventListener(): Promise<void> {
+    try {
+      const jsonRpcProvider = new ethers.JsonRpcProvider(HTTP_ENDPOINT);
+      const provider = new ethers.WebSocketProvider(WS_ENDPOINT);
+      logger.info('Connected to provider');
+
+      provider.on('block', async (blockNumber) => {
+        logger.info(`Received block ${blockNumber}`);
+
+        const block = await jsonRpcProvider.getBlock(blockNumber, true);
+
+        if (!block) {
+          return;
+        }
+
+        const relevantTxs = block.prefetchedTransactions.filter((tx) => tx.from?.toLowerCase() === TARGET_ADDRESS);
+
+        if (relevantTxs.length > 0) {
+          logger.info(
+            `Found ${relevantTxs.length} transactions for address ${TARGET_ADDRESS} in block ${block.number}`
+          );
+          logger.info(JSON.stringify(relevantTxs, null, 2));
+        }
+      });
+    } catch (e) {
+      logger.error(`Error in event listener setup: ${sanitizeError(e)}`);
+      throw e;
+    }
   }
 }
