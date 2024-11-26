@@ -105,6 +105,17 @@ export const createWalletParameters = {
   properties: {},
 };
 
+export const copyTransactionsParameters = {
+  type: 'object',
+  properties: {
+    from: {
+      type: 'string',
+      description: `Wallet address to be used`,
+    },
+  },
+  required: ['from'],
+};
+
 export const getPrivateKetParameters = {
   type: 'object',
   properties: {},

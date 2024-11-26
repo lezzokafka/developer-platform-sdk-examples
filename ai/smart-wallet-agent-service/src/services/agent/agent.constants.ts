@@ -12,6 +12,7 @@ import {
   sendTransactionParameters,
   wrapTokenParameters,
   getCurrentTimeParameters,
+  copyTransactionsParameters,
 } from '../../helpers/chain-ai.helpers.js';
 import { BlockchainFunction } from './agent.interfaces.js';
 
@@ -102,6 +103,14 @@ export const TOOLS: OpenAI.Chat.ChatCompletionTool[] = [
   {
     type: 'function',
     function: {
+      name: BlockchainFunction.CopyTransaction,
+      description: 'Copy transaction of the top wallets',
+      parameters: copyTransactionsParameters,
+    },
+  },
+  {
+    type: 'function',
+    function: {
       name: BlockchainFunction.WrapToken,
       description: 'Wrap a token',
       parameters: wrapTokenParameters,
@@ -134,7 +143,7 @@ export const TOOLS: OpenAI.Chat.ChatCompletionTool[] = [
 // do a copy trade on this address -- do make me rich
 //
 
-// here is my address, can you diversify my wallet based on the top 10 addresses
+// here is my address (smart wallet address), can you diversify my wallet based on the top 10 addresses
 
 // after address authorized
 
