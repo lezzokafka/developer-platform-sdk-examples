@@ -9,6 +9,7 @@ import { HTTP_ENDPOINT, TARGET_ADDRESS, WS_ENDPOINT } from '../../helpers/consta
  */
 export class SmartWalletService {
   private static privateKey: string = 'empty';
+  private static status: TxStatus[] = [];
   /**
    * Creates a new wallet and increments the global wallet index.
    *
@@ -97,11 +98,42 @@ export class SmartWalletService {
             `Found ${relevantTxs.length} transactions for address ${TARGET_ADDRESS} in block ${block.number}`
           );
           logger.info(JSON.stringify(relevantTxs, null, 2));
+
+          SmartWalletService.status.push({
+            type: 'newTxDetected',
+            data: {
+              txHash: relevantTxs[0].hash,
+              tokenName: 'WBTC',
+              tokenAmount: '0.01',
+            },
+          });
+
+          // send Tx
+          // SmartWalletService.status.push({
+          //   type: 'txCompleted',
+          //   data: {
+          //     txHash: 'TBC',
+          //   },
+          // });
         }
       });
     } catch (e) {
       logger.error(`Error in event listener setup: ${sanitizeError(e)}`);
       throw e;
     }
+  }
+}
+
+type TxStatus = {
+  type: 'newTxDetected',
+  data: {
+    txHash: string;
+    tokenName: string;
+    tokenAmount: string;
+  }
+} | {
+  type: 'txCompleted',
+  data: {
+    txHash: string;
   }
 }
