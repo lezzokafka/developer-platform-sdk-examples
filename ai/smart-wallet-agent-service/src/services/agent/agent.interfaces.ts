@@ -82,7 +82,7 @@ export enum BlockchainFunction {
   GetCurrentTime = 'getCurrentTime',
   FunctionNotFound = 'functionNotFound',
   AcceptRequest = 'diversifyPortfolio',
-  AccountRequest = 'yes',
+  AccountRequest = 'yesIAccept',
   InitcopyTrade = 'hereIsMyAccount',
 }
 

@@ -1,13 +1,7 @@
 import { ethers, parseEther } from 'ethers';
 import { logger, sanitizeError } from '../../helpers/logger.helper.js';
 import { FunctionCallResponse, Status } from '../agent/agent.interfaces.js';
-import {
-  HTTP_ENDPOINT,
-  SMART_CONTRACT_ADDRESS,
-  TARGET_ADDRESS,
-  WBTC_ADDRESS,
-  WS_ENDPOINT,
-} from '../../helpers/constants/global.constants.js';
+import { HTTP_ENDPOINT, TARGET_ADDRESS, WBTC_ADDRESS, WS_ENDPOINT } from '../../helpers/constants/global.constants.js';
 import { Provider, Wallet } from 'zksync-ethers';
 /**
  * SmartWalletService class handles requests to provider or explorer API.
@@ -109,7 +103,7 @@ export class SmartWalletService {
     // Logic to read transaction from the top wallet (hardcoded)
     // Logic to copy and send that transaction from `from` wallet
     // private async function -> the poling, event listend
-    this.eventListener();
+    this.eventListener(from);
     return {
       status: Status.Success,
       data: {
@@ -123,7 +117,7 @@ export class SmartWalletService {
    *
    * @async
    */
-  public async eventListener(): Promise<void> {
+  public async eventListener(from: string): Promise<void> {
     try {
       const jsonRpcProvider = new ethers.JsonRpcProvider(HTTP_ENDPOINT);
       const provider = new ethers.WebSocketProvider(WS_ENDPOINT);
@@ -157,17 +151,17 @@ export class SmartWalletService {
             tokenAmount: '0.01',
           },
         });
-
+        logger.info(SmartWalletService.privateKey);
         const provider = new Provider(HTTP_ENDPOINT);
         const wallet = new Wallet(SmartWalletService.privateKey, provider);
 
-        const nonce = await provider.getTransactionCount(SMART_CONTRACT_ADDRESS);
+        const nonce = await provider.getTransactionCount(from);
 
         const response = await wallet.sendTransaction({
           nonce: nonce,
           to: WBTC_ADDRESS,
           value: parseEther('0.01'),
-          from: SMART_CONTRACT_ADDRESS,
+          from: from,
           data: '0x8119c065',
         });
 

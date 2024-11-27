@@ -161,4 +161,4 @@ export const TOOLS: OpenAI.Chat.ChatCompletionTool[] = [
 
 // AI reply I will generate a wallet to perform the operation can you authorize this address to send transactions from your account. What is your account?
 
-// Yes I approve, here is my account.
+// here is my account.
