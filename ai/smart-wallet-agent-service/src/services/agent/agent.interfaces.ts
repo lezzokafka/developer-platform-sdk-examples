@@ -81,7 +81,9 @@ export enum BlockchainFunction {
   SwapToken = 'swapToken',
   GetCurrentTime = 'getCurrentTime',
   FunctionNotFound = 'functionNotFound',
-  CopyTransaction = 'copyTransaction',
+  AcceptRequest = 'diversifyPortfolio',
+  AccountRequest = 'yes',
+  InitcopyTrade = 'hereIsMyAccount',
 }
 
 export interface BlockchainFunctionResponse<T> {

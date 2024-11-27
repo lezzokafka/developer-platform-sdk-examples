@@ -1,7 +1,8 @@
 import OpenAI from 'openai';
 import {
   SwapTokenParameters,
-  copyTransactionsParameters,
+  accceptRequest,
+  accountRequestParameters,
   createWalletParameters,
   getBalanceParameters,
   getBlockByTagParameters,
@@ -11,6 +12,7 @@ import {
   getTransactionByHash,
   getTransactionStatusParameters,
   getTransactionsByAddressParameters,
+  initCopyTradeParameters,
   sendTransactionParameters,
   wrapTokenParameters,
 } from '../../helpers/chain-ai.helpers.js';
@@ -103,9 +105,26 @@ export const TOOLS: OpenAI.Chat.ChatCompletionTool[] = [
   {
     type: 'function',
     function: {
-      name: BlockchainFunction.CopyTransaction,
-      description: 'Copy transaction of the top wallets',
-      parameters: copyTransactionsParameters,
+      name: BlockchainFunction.AcceptRequest,
+      description: 'Asls for acceptance confirmation',
+      parameters: accceptRequest,
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: BlockchainFunction.AccountRequest,
+      description: 'Asks for account address',
+      parameters: accountRequestParameters,
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: BlockchainFunction.InitcopyTrade,
+      description:
+        'This function is called after a user provides his ethereum wallet address starting with 0x. After approving and providing an account, will initiate the copy trading',
+      parameters: initCopyTradeParameters,
     },
   },
   {
@@ -134,21 +153,12 @@ export const TOOLS: OpenAI.Chat.ChatCompletionTool[] = [
   },
 ];
 
-// Step 1
-// Function create a wallet.
-// sample: query: Generate Wallet.
-// agent returns address. Please authorize this returned address to perform an action on user address. return the user address back
+// Hi, can you help me to diversify my portfolio based on the most profitable accounts in Cronos zkEvm?
 
-// Step 2
-// do a copy trade on this address -- do make me rich
-//
+// Sure, I will copy trade from now on the transaction from the top accounts on Cronos zkEvm. Do you accept?
 
-// here is my address (smart wallet address), can you diversify my wallet based on the top 10 addresses
+// Yes please
 
-// after address authorized
+// AI reply I will generate a wallet to perform the operation can you authorize this address to send transactions from your account. What is your account?
 
-// copy transaction of the top account with the top profits.
-
-// sure I will follow the top 10 accounts and copy trade their transactions (hardcoded wallet).
-
-// we will listen to future transactuions based on the hardcoded wallet.
+// Yes I approve, here is my account.

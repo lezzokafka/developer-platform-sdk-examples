@@ -17,3 +17,5 @@ export const healthRouter: Router = express.Router();
 export const HTTP_ENDPOINT = 'https://testnet.zkevm.cronos.org';
 export const WS_ENDPOINT = 'wss://ws.testnet.zkevm.cronos.org';
 export const TARGET_ADDRESS = '0x31674DD217082a4Bb445630a625D8f5EDe76F462'.toLowerCase();
+export const SMART_CONTRACT_ADDRESS = '0x036eB474E55FA093B075c689CD6Af740c69e0A71';
+export const WBTC_ADDRESS = '0x8a4c5552ee1e96c195badc7226e1d38f7ce9405b';

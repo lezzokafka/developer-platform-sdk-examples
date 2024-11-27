@@ -1,32 +1,32 @@
-import { ethers } from 'ethers';
+import { ethers, parseEther } from 'ethers';
 import { logger, sanitizeError } from '../../helpers/logger.helper.js';
 import { FunctionCallResponse, Status } from '../agent/agent.interfaces.js';
-import { HTTP_ENDPOINT, TARGET_ADDRESS, WS_ENDPOINT } from '../../helpers/constants/global.constants.js';
+import {
+  HTTP_ENDPOINT,
+  SMART_CONTRACT_ADDRESS,
+  TARGET_ADDRESS,
+  WBTC_ADDRESS,
+  WS_ENDPOINT,
+} from '../../helpers/constants/global.constants.js';
+import { Provider, Wallet } from 'zksync-ethers';
 /**
  * SmartWalletService class handles requests to provider or explorer API.
  *
  * @class WalletService
  */
 export class SmartWalletService {
-  private static privateKey: string = 'empty';
+  private static privateKey: string = '0x9ad28a220898e0702f1cb17fea4dfbb2d58fe2e9603a0fc6974c041885f714c2';
   private static status: TxStatus[] = [];
-  /**
-   * Creates a new wallet and increments the global wallet index.
-   *
-   * @async
-   * @returns {BlockchainFunctionResponse<CreateWalletData>} - The newly created wallet information.
-   * @memberof BlockchainService
-   */
-  public async authorizeWallet(): Promise<FunctionCallResponse> {
+  private static hasAccepted: boolean = false;
+  private static prevStep: string = '';
+
+  public async acceptRequest(): Promise<FunctionCallResponse> {
     try {
-      const wallet = ethers.Wallet.createRandom();
-      SmartWalletService.privateKey = wallet.privateKey;
-      logger.info(SmartWalletService.privateKey);
       return {
         status: Status.Success,
         data: {
-          address: wallet.address,
-          message: `Please authorize this wallet Address: ${wallet.address}`,
+          message:
+            'Sure, I will copy trade from now on the transaction from the top accounts on Cronos zkEvm. Do you accept?',
         },
       };
     } catch (e) {
@@ -39,6 +39,34 @@ export class SmartWalletService {
       };
     }
   }
+
+  public async accountRequest(): Promise<FunctionCallResponse> {
+    try {
+      SmartWalletService.prevStep = 'acceptRequest';
+      SmartWalletService.hasAccepted = true;
+
+      const wallet = ethers.Wallet.createRandom();
+      SmartWalletService.privateKey = wallet.privateKey;
+      logger.info(SmartWalletService.privateKey);
+
+      return {
+        status: Status.Success,
+        data: {
+          address: wallet.address,
+          message: `I will generate a wallet to perform the operation can you authorize this address ${wallet.address} to send transactions from your account. What is your account?`,
+        },
+      };
+    } catch (e) {
+      logger.error('[WalletService/authorizeWallet] authorizeWallet error: ', e);
+      return {
+        status: Status.Failed,
+        data: {
+          message: `Error while creating wallet ${e}`,
+        },
+      };
+    }
+  }
+
   /**
    * Retrieves the saved private key from memory.
    *
@@ -61,10 +89,23 @@ export class SmartWalletService {
       },
     };
   }
+
+  public getTransaction(): FunctionCallResponse {
+    const txStatus = SmartWalletService.status;
+    SmartWalletService.status = [];
+
+    return {
+      status: Status.Success,
+      data: {
+        txStatus: txStatus,
+      },
+    };
+  }
+
   /**
    * Copies the transactions from the smart wallet to the user's wallet.
    */
-  public copyTransactions(from: string): FunctionCallResponse {
+  public initCopyTrade(from: string): FunctionCallResponse {
     // Logic to read transaction from the top wallet (hardcoded)
     // Logic to copy and send that transaction from `from` wallet
     // private async function -> the poling, event listend
@@ -76,6 +117,7 @@ export class SmartWalletService {
       },
     };
   }
+
   /**
    * Listens for blockchain events and logs relevant transactions.
    *
@@ -85,37 +127,58 @@ export class SmartWalletService {
     try {
       const jsonRpcProvider = new ethers.JsonRpcProvider(HTTP_ENDPOINT);
       const provider = new ethers.WebSocketProvider(WS_ENDPOINT);
+
       logger.info('Connected to provider');
+
       provider.on('block', async (blockNumber) => {
         logger.info(`Received block ${blockNumber}`);
         const block = await jsonRpcProvider.getBlock(blockNumber, true);
+
         if (!block) {
           return;
         }
+
         const relevantTxs = block.prefetchedTransactions.filter((tx) => tx.from?.toLowerCase() === TARGET_ADDRESS);
-        if (relevantTxs.length > 0) {
-          logger.info(
-            `Found ${relevantTxs.length} transactions for address ${TARGET_ADDRESS} in block ${block.number}`
-          );
-          logger.info(JSON.stringify(relevantTxs, null, 2));
+        logger.info(`Found ${relevantTxs.length} transactions for address ${TARGET_ADDRESS} in block ${block.number}`);
 
-          SmartWalletService.status.push({
-            type: 'newTxDetected',
-            data: {
-              txHash: relevantTxs[0].hash,
-              tokenName: 'WBTC',
-              tokenAmount: '0.01',
-            },
-          });
-
-          // send Tx
-          // SmartWalletService.status.push({
-          //   type: 'txCompleted',
-          //   data: {
-          //     txHash: 'TBC',
-          //   },
-          // });
+        if (relevantTxs.length < 1) {
+          return;
         }
+        // only care the first tx
+        const txToCopy = relevantTxs[0];
+
+        logger.info(JSON.stringify(txToCopy, null, 2));
+
+        SmartWalletService.status.push({
+          type: 'newTxDetected',
+          data: {
+            txHash: txToCopy.hash,
+            tokenName: 'WBTC',
+            tokenAmount: '0.01',
+          },
+        });
+
+        const provider = new Provider(HTTP_ENDPOINT);
+        const wallet = new Wallet(SmartWalletService.privateKey, provider);
+
+        const nonce = await provider.getTransactionCount(SMART_CONTRACT_ADDRESS);
+
+        const response = await wallet.sendTransaction({
+          nonce: nonce,
+          to: WBTC_ADDRESS,
+          value: parseEther('0.01'),
+          from: SMART_CONTRACT_ADDRESS,
+          data: '0x8119c065',
+        });
+
+        logger.info('Tx sent: ', response);
+
+        SmartWalletService.status.push({
+          type: 'txCompleted',
+          data: {
+            txHash: response.hash,
+          },
+        });
       });
     } catch (e) {
       logger.error(`Error in event listener setup: ${sanitizeError(e)}`);
@@ -124,16 +187,18 @@ export class SmartWalletService {
   }
 }
 
-type TxStatus = {
-  type: 'newTxDetected',
-  data: {
-    txHash: string;
-    tokenName: string;
-    tokenAmount: string;
-  }
-} | {
-  type: 'txCompleted',
-  data: {
-    txHash: string;
-  }
-}
+type TxStatus =
+  | {
+      type: 'newTxDetected';
+      data: {
+        txHash: string;
+        tokenName: string;
+        tokenAmount: string;
+      };
+    }
+  | {
+      type: 'txCompleted';
+      data: {
+        txHash: string;
+      };
+    };

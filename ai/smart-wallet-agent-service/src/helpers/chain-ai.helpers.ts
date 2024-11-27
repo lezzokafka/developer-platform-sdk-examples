@@ -100,12 +100,17 @@ export const getTransactionStatusParameters = {
   required: ['txHash'],
 };
 
-export const createWalletParameters = {
+export const accountRequestParameters = {
   type: 'object',
   properties: {},
 };
 
-export const copyTransactionsParameters = {
+export const accceptRequest = {
+  type: 'object',
+  properties: {},
+};
+
+export const initCopyTradeParameters = {
   type: 'object',
   properties: {
     from: {
@@ -114,6 +119,11 @@ export const copyTransactionsParameters = {
     },
   },
   required: ['from'],
+};
+
+export const createWalletParameters = {
+  type: 'object',
+  properties: {},
 };
 
 export const getPrivateKetParameters = {

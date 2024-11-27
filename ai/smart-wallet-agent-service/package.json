@@ -18,7 +18,7 @@
     "axios": "1.7.7",
     "cors": "2.8.5",
     "dotenv": "16.4.5",
-    "ethers": "^6.13.2",
+    "ethers": "file:///Users/ricardoarcifa/Desktop/hackathon/cdc-hackathon/ether.js-otk",
     "express": "4.21.1",
     "express-rate-limit": "7.4.0",
     "express-validator": "7.2.0",
@@ -27,7 +27,8 @@
     "openai": "4.63.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "5.0.1",
-    "winston": "3.14.2"
+    "winston": "3.14.2",
+    "zksync-ethers": "^6.15.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.0",
@@ -40,7 +41,6 @@
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.6",
     "eslint": "^9.11.0",
-    "ethers": "^6.13.2",
     "nodemon": "^3.1.7",
     "npm": "^10.8.3",
     "prettier": "3.3.3",

@@ -6,6 +6,7 @@ import { HealthCheckResponse, QueryResponse } from '../services/query/query.inte
 import { QueryService } from '../services/query/query.service.js';
 import { HTTP_STATUS } from './../lib/interfaces/api.interface.js';
 import { Status } from '../services/agent/agent.interfaces.js';
+import { SmartWalletService } from '../services/smartwallet/smartwallet.service.js';
 
 /**
  * Controller function to handle a query request.
@@ -74,6 +75,32 @@ export const healthCheck = async (
         message: HTTP_MESSAGES.MESSAGE_OK,
         timestamp: Date.now(),
       },
+    });
+  } catch (e) {
+    return res.status(HTTP_CODES.SERVICE_UNAVAILABLE).json({
+      status: HTTP_STATUS.FAILED,
+      message: getErrorMessage(e),
+    });
+  }
+};
+
+/**
+ * Asynchronous function for performing a health check of the application.
+ * This function generates a health report including the application's uptime, response time, a success message, and the current timestamp.
+ *
+ * @async
+ * @param {Request} _req - The Express request object (unused in this function, hence the underscore prefix).
+ * @param {Response<HealthCheckResponse | ResponseError>} res - Response is a HealthCheckResponse object if successful, or a ResponseError object if an error occurs
+ * @returns {Promise<Response>} A promise that resolves with a JSON response containing the health check data.
+ */
+export const getEvents = async (_req: Request, res: Response) => {
+  try {
+    const smartWalletService = new SmartWalletService();
+    const events = smartWalletService.getTransaction();
+
+    return res.status(HTTP_CODES.OK).json({
+      status: HTTP_STATUS.SUCCESS,
+      results: events,
     });
   } catch (e) {
     return res.status(HTTP_CODES.SERVICE_UNAVAILABLE).json({

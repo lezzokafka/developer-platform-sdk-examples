@@ -5,4 +5,6 @@ import { aiAgentRouter } from '../helpers/constants/global.constants.js';
 
 aiAgentRouter.post('/query', validate.queryInputValidator, controller.generateResponse);
 
+aiAgentRouter.get('/events', controller.getEvents);
+
 export default aiAgentRouter;

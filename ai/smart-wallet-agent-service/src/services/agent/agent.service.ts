@@ -158,12 +158,14 @@ export class AIAgentService {
           return await Block.getBlockByTag(functionArgs.blockTag);
         case BlockchainFunction.GetTransactionStatus:
           return await Transaction.getTransactionStatus(functionArgs.txHash);
-        case BlockchainFunction.CreateWallet:
-          return this.smartWalletService.authorizeWallet();
         case BlockchainFunction.GetPrivateKey:
           return this.smartWalletService.getPrivateKey();
-        case BlockchainFunction.CopyTransaction:
-          return this.smartWalletService.copyTransactions(functionArgs.from);
+        case BlockchainFunction.AcceptRequest:
+          return this.smartWalletService.acceptRequest();
+        case BlockchainFunction.AccountRequest:
+          return this.smartWalletService.accountRequest();
+        case BlockchainFunction.InitcopyTrade:
+          return this.smartWalletService.initCopyTrade(functionArgs.from);
         case BlockchainFunction.TransferToken:
           return await this.tokenService.transfer(
             functionArgs.to,
