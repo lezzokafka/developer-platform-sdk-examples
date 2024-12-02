@@ -7,33 +7,53 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Add this check after load_dotenv()
+# Check both API keys after load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
+google_api_key = os.getenv("GOOGLE_API_KEY")
+
 if not api_key:
     print("Error: OPENAI_API_KEY not found in environment variables.")
     print("Please make sure you have set the OPENAI_API_KEY in your .env file.")
     exit(1)
 else:
-    print("✓ OPENAI_API_KEY is successfully ready")
-    print()
+    print("✓ OPENAI_API_KEY has been imported successfully")
+
+if not google_api_key:
+    print("Error: GOOGLE_API_KEY not found in environment variables.")
+    print("Please make sure you have set the GOOGLE_API_KEY in your .env file.")
+    exit(1)
+else:
+    print("✓ GOOGLE_API_KEY has been imported successfully")
+
+print()  # Add blank line after checks
 
 
-def send_query(query: str, context: list = None) -> dict:
+def send_query(query: str, context: list = None, provider: str = "gemini") -> dict:
     """
     Send a query to the AI Agent Service and return the response.
 
     Args:
         query (str): The natural language query to send
+        context (list, optional): Context for the conversation
+        provider (str, optional): LLM provider to use (provider_choice)
 
     Returns:
         dict: The JSON response from the service
     """
     url = "http://localhost:8000/api/v1/cdc-ai-agent-service/query"
 
+    # Configure provider options
+    provider_options = {}
+    if provider == "openai":
+        provider_options["openAI"] = {"apiKey": os.getenv("OPENAI_API_KEY")}
+    else:  # gemini
+        provider_options["gemini"] = {"apiKey": os.getenv("GOOGLE_API_KEY")}
+
     payload = {
         "query": query,
         "options": {
-            "openAI": {"apiKey": os.getenv("OPENAI_API_KEY")},
+            **provider_options,
+            "llmProvider": provider,
             "context": context,
         },
     }
@@ -51,30 +71,37 @@ def send_query(query: str, context: list = None) -> dict:
 
 def main():
     print("Welcome to the Crypto.com AI Agent Chat!")
-    print("Type 'quit' to exit")
+
+    # Ask for provider choice at startup - this will be fixed for the session
+    while True:
+        provider = input("Choose your AI provider (openai/gemini): ").strip().lower()
+        if provider in ["openai", "gemini"]:
+            break
+        print("Invalid choice. Please enter 'openai' or 'gemini'")
+
+    print("\nType 'quit' to exit")
     print("Use up/down arrow keys to navigate command history")
+    print(f"Using: {provider}")
     print("-" * 50)
 
     # Configure readline to use in-memory history
-    readline.set_history_length(1000)  # Limit history to 1000 entries
+    readline.set_history_length(1000)
 
     context = []
+
     while True:
         try:
-            # Get user input (readline will handle arrow key history automatically)
-            user_input = input("\nYou: ").strip()
+            user_input = input(f"\nYou: ").strip()
 
-            # Check for quit command
             if user_input.lower() == "quit":
                 print("\nGoodbye!")
                 break
 
-            # Skip empty input
             if not user_input:
                 continue
 
-            # Send query to AI Agent Service
-            response = send_query(user_input, context)
+            # Send query with fixed provider
+            response = send_query(user_input, context, provider)
 
             # Update context if response has context
             if "context" in response:
