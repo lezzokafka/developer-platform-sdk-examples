@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": "https://github.com/matter-labs/zksync-hardhat-template.git",
   "scripts": {
-    "compile": "hardhat compile export",
+    "compile": "hardhat compile",
     "deploy": "ts-node deploy/deploy-OTKAccount.ts",
     "interact": "hardhat deploy-zksync --script interact.ts",
     "generatewallets": "hardhat deploy-zksync --script generate-wallets.ts",

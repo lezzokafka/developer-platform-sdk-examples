@@ -17,7 +17,6 @@ contract WBTC is ERC20Burnable, ERC20Pausable, AccessControl {
     bytes32 public constant CONTROLLER_ROLE = keccak256("CONTROLLER_ROLE");
 
     event Deposit(address indexed sender, uint256 amount);
-    event Withdrawal(address indexed recipient, uint256 amount);
 
     /**
      * @dev Constructor to initialize the token with default values.
@@ -65,17 +64,6 @@ contract WBTC is ERC20Burnable, ERC20Pausable, AccessControl {
         require(msg.value > 0, "Must send value");
         _mint(msg.sender, msg.value);
         emit Deposit(msg.sender, msg.value);
-    }
-
-    // Burn WBTC to get native token back
-    function withdraw(uint256 amount) public {
-        require(amount > 0, "Amount must be greater than 0");
-        require(balanceOf(msg.sender) >= amount, "Insufficient balance");
-        
-        _burn(msg.sender, amount);
-        (bool success, ) = msg.sender.call{value: amount}("");
-        require(success, "Transfer failed");
-        emit Withdrawal(msg.sender, amount);
     }
 
     // Required to receive native token
