@@ -112,8 +112,9 @@ Deploy the smart wallet contract using the address generated in the previous ste
 #### Step 1: Deploy the Smart Wallet
 **Command:**
 ```bash
+cd ../smart-wallet-core-solidty
+npx hardhat compile
 yarn deploy --args '0x00a897Ac6cb6f1566D638c3596a45d3Bb28757DC'
-```
 
 Replace `0x00a897Ac6cb6f1566D638c3596a45d3Bb28757DC` with the address from the AI agent response.
 
